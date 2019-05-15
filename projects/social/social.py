@@ -1,8 +1,12 @@
+import random
+
+from util import Queue
 
 
 class User:
     def __init__(self, name):
         self.name = name
+
 
 class SocialGraph:
     def __init__(self):
@@ -44,11 +48,32 @@ class SocialGraph:
         self.lastID = 0
         self.users = {}
         self.friendships = {}
-        # !!!! IMPLEMENT ME
 
         # Add users
+        # Time Complexity: O(numUsers)
+        # Space Complexity: O(numUsers)
+        for i in range(numUsers):
+            self.addUser(f"User {i + 1}")
 
         # Create friendships
+        # avgFriendships = totalFriendships / numUsers
+        # totalFriendships = avgFriendships * numUsers
+        # Time Complexity: O(numUsers ^ 2)
+        # Space Complexity: O(numUsers ^ 2)
+        possibleFriendships = []
+        for userID in self.users:
+            for friendID in range(userID + 1, self.lastID + 1):
+                possibleFriendships.append((userID, friendID))
+
+        # Time Complexity: O(numUsers ^ 2)
+        # Space Complexity: O(1)
+        random.shuffle(possibleFriendships)
+
+        # Time Complexity: O(avgFriendships * numUsers // 2)
+        # Space Complexity: O(avgFriendships * numUsers // 2)
+        for friendship_index in range(avgFriendships * numUsers // 2):
+            friendship = possibleFriendships[friendship_index]
+            self.addFriendship(friendship[0], friendship[1])
 
     def getAllSocialPaths(self, userID):
         """
@@ -61,6 +86,21 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+
+        queue = Queue()
+        queue.enqueue([userID])
+
+        while queue.size() > 0:
+            path = queue.dequeue()
+            lastItemInPath = path[-1]
+            if lastItemInPath not in visited:
+                visited[lastItemInPath] = path
+                for itemLink in self.friendships[lastItemInPath]:
+                    if itemLink not in visited:
+                        path_copy = path.copy()
+                        path_copy.append(itemLink)
+                        queue.enqueue(path_copy)
+
         return visited
 
 
